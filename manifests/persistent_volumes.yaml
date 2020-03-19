@@ -31,7 +31,7 @@ metadata:
   labels:
     app: mysqldb
 spec:
-  storageClassName: standard
+  storageClassName: manual
   accessModes:
     - ReadWriteOnce
   resources:
@@ -45,7 +45,7 @@ metadata:
   labels:
     app: mongodb
 spec:
-  storageClassName: standard
+  storageClassName: manual
   accessModes:
     - ReadWriteOnce
   resources:
