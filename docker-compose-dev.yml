@@ -1,0 +1,92 @@
+version: "3.6"
+services:
+  server:
+    build: ./server
+    depends_on:
+      - mongodb
+      - rabbitmq
+    ports:
+      - "8080:8080"
+    environment:
+      - MONGO_URL=mongodb://mongodb:27017/
+      - MONGO_HOST=mongodb
+      - MONGO_DB_NAME=test
+      - MONGO_DB_USER=root
+      - MONGO_DB_PASSWORD=password
+      - RABBIT_MQ_HOST=rabbitmq
+      - RABBIT_MQ_CONN_STRING=amqp://rabbitmq:rabbitmq@rabbitmq
+
+  externalservice:
+    build: ./externalservice
+    ports:
+      - "9090:9090"
+
+  worker:
+    build: ./worker
+    depends_on:
+      - mysqldb
+      - rabbitmq
+    environment:
+      - SPRING_MYSQLDB_HOST=mysqldb
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/test
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=password
+      - GRPC_CLIENT_UPPERCASESERVER_ADDRESS=static://externalservice:9090
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=rabbitmq
+      - SPRING_RABBITMQ_PASSWORD=rabbitmq
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    environment:
+      - RABBITMQ_DEFAULT_USER=rabbitmq
+      - RABBITMQ_DEFAULT_PASS=rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  mongodb:
+    image: mongo:4.2.3-bionic
+    environment:
+      - MONGO_INITDB_DATABASE=test
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data_container:/data/db
+
+  mysqldb:
+    image: mysql:5.7
+    environment:
+      - MYSQL_DATABASE=test
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=password
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+# Development services
+
+  mongo-express:
+    image: mongo-express:0.54.0
+    ports:
+      - 8081:8081
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=password
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+
+  adminer:
+    image: adminer:4.7.6-standalone
+    depends_on: 
+      - mysqldb
+    ports:
+      - 8082:8080
+
+volumes:
+  mongodb_data_container:
+  mysql_data:

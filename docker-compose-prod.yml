@@ -1,0 +1,66 @@
+version: "3.6"
+services:
+  server:
+    image: mastercloudapps/pa-server:1.0
+    depends_on:
+      - mongodb
+      - rabbitmq
+    ports:
+      - "8080:8080"
+    environment:
+      - MONGO_URL=mongodb://mongodb:27017/
+      - MONGO_HOST=mongodb
+      - MONGO_DB_NAME=test
+      - MONGO_DB_USER=root
+      - MONGO_DB_PASSWORD=password
+      - RABBIT_MQ_HOST=rabbitmq
+      - RABBIT_MQ_CONN_STRING=amqp://rabbitmq:rabbitmq@rabbitmq
+
+  externalservice:
+    image: mastercloudapps/pa-externalservice:1.0
+
+  worker:
+    image: mastercloudapps/pa-worker:1.0
+    #image: mastercloudapps/pa-worker-jib:1.0
+    depends_on:
+      - mysqldb
+      - rabbitmq
+    environment:
+      - SPRING_MYSQLDB_HOST=mysqldb
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/test
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=password
+      - GRPC_CLIENT_UPPERCASESERVER_ADDRESS=static://externalservice:9090
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=rabbitmq
+      - SPRING_RABBITMQ_PASSWORD=rabbitmq
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    environment:
+      - RABBITMQ_DEFAULT_USER=rabbitmq
+      - RABBITMQ_DEFAULT_PASS=rabbitmq
+
+  mongodb:
+    image: mongo:4.2.3-bionic
+    environment:
+      - MONGO_INITDB_DATABASE=test
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    volumes:
+      - mongodb_data_container:/data/db
+
+  mysqldb:
+    image: mysql:5.7
+    environment:
+      - MYSQL_DATABASE=test
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=password
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mongodb_data_container:
+  mysql_data:

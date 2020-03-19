@@ -1,0 +1,16 @@
+"@startuml Communications diagram"
+
+Client->Server : WebSocket connection [WS]
+Client->Server : Create Task [REST]
+Server->Client : Response [REST]
+Server->Worker : newTask message [AMQP]
+Worker->ExternalService: toUpperCaseRequest [RPC]
+ExternalService->Worker: toUpperCaseResponse [RPC]
+Worker->Server : taskProgress message 10% [AMQP]
+Server->Client : taskProgress message 10% [WS]
+
+Worker->Server : taskProgress message 20% [AMQP]
+Server->Client : taskProgress message 20% [WS]
+...
+Worker->Server : taskProgress message 100% [AMQP]
+Server->Client : taskProgress message 100% [WS]

@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: worker2externalservice
+spec:
+  podSelector:
+    matchLabels:
+      app: externalservice
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: worker
+    ports:
+    - port: 9090
+      protocol: TCP
