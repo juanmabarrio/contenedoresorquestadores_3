@@ -14,21 +14,21 @@ spec:
       containers:
       - name: mysqldb
         image: mysql:5.6
-        # volumeMounts:
-        # - name: mysql-data
-        #   mountPath: /var/lib/mysql
+        volumeMounts:
+        - name: mysql-data
+          mountPath: /var/lib/mysql
         env:
         - name: MYSQL_ROOT_PASSWORD
           value: pass
         - name: MYSQL_DATABASE
           value: test
-      #   volumeMounts:
-      #       - mountPath: /var/lib/mysql
-      #         name: mysql-storage
-      # volumes:
-      #   - name: mysql-storage
-      #     persistentVolumeClaim:
-      #       claimName: mysql-pvc 
+        volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mysql-storage
+      volumes:
+        - name: mysql-storage
+          persistentVolumeClaim:
+            claimName: mysql-pvc 
 
 
 ---
