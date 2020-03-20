@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: rabbitFromServer
+  name: rabbit-from-Server
 spec:
   podSelector:
     matchLabels:
@@ -20,7 +20,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: rabbitToServer
+  name: rabbit-to-server
 spec:
   podSelector:
     matchLabels:
@@ -39,7 +39,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: serverFromRabbit
+  name: server-from-rabbit
 spec:
   podSelector:
     matchLabels:
@@ -58,7 +58,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: serverToRabbit
+  name: server-to-rabbit
 spec:
   podSelector:
     matchLabels:
@@ -78,7 +78,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: mongoFromServer
+  name: mongo-from-server
 spec:
   podSelector:
     matchLabels:
@@ -95,7 +95,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: mongoToServer
+  name: mongo-to-server
 spec:
   podSelector:
     matchLabels:
