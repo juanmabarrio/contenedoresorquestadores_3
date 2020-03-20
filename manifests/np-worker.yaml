@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: worker2rabbit
+  name: rabbit-from-worker
 spec:
   podSelector:
     matchLabels:
@@ -20,7 +20,26 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: worker2mysql
+  name: worker-to-rabbit
+spec:
+  podSelector:
+    matchLabels:
+      app: worker
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: rabbitmq
+    ports:
+    - port: 15672
+      protocol: TCP
+    - port: 5672
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: mysql-from-worker
 spec:
   podSelector:
     matchLabels:
@@ -37,14 +56,16 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: worker-allow-all-egress
+  name: worker-to-mysql
 spec:
-  podSelector: 
-      matchLabels:
-        app: worker
+  podSelector:
+    matchLabels:
+      app: worker
   egress:
-  - {}
-  policyTypes:
-  - Egress
-
-  
+  - to:
+    - podSelector:
+        matchLabels:
+          app: mysqldb
+    ports:
+    - port: 3306
+      protocol: TCP
