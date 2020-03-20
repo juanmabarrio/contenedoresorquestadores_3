@@ -20,44 +20,6 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: rabbit-to-server
-spec:
-  podSelector:
-    matchLabels:
-      app: rabbitmq
-  egress:
-  - to:
-    - podSelector:
-        matchLabels:
-          app: server
-    ports:
-    - port: 15672
-      protocol: TCP
-    - port: 5672
-      protocol: TCP
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: server-from-rabbit
-spec:
-  podSelector:
-    matchLabels:
-      app: server
-  ingress:
-  - from:
-    - podSelector:
-        matchLabels:
-          app: rabbitmq
-    ports:
-    - port: 15672
-      protocol: TCP
-    - port: 5672
-      protocol: TCP
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
   name: server-to-rabbit
 spec:
   podSelector:
