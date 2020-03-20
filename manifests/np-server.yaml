@@ -57,16 +57,16 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: mongo-to-server
+  name: server-to-mongo
 spec:
   podSelector:
     matchLabels:
-      app: mongodb
+      app: server
   egress:
   - to:
     - podSelector:
         matchLabels:
-          app: server
+          app: mongodb
     ports:
     - port: 27017
       protocol: TCP
