@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: server2rabbit
+  name: rabbitFromServer
 spec:
   podSelector:
     matchLabels:
@@ -20,7 +20,65 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: server2mongodb
+  name: rabbitToServer
+spec:
+  podSelector:
+    matchLabels:
+      app: rabbitmq
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: server
+    ports:
+    - port: 15672
+      protocol: TCP
+    - port: 5672
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: serverFromRabbit
+spec:
+  podSelector:
+    matchLabels:
+      app: server
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: rabbitmq
+    ports:
+    - port: 15672
+      protocol: TCP
+    - port: 5672
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: serverToRabbit
+spec:
+  podSelector:
+    matchLabels:
+      app: server
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: rabbitmq
+    ports:
+    - port: 15672
+      protocol: TCP
+    - port: 5672
+      protocol: TCP
+---
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: mongoFromServer
 spec:
   podSelector:
     matchLabels:
@@ -37,25 +95,43 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: server-external-ingress
+  name: mongoToServer
 spec:
   podSelector:
     matchLabels:
-      app: server
-  ingress:
-    - from: []
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-all-egress
-spec:
-  podSelector: 
-      matchLabels:
-        app: server
+      app: mongodb
   egress:
-  - {}
-  policyTypes:
-  - Egress
+  - to:
+    - podSelector:
+        matchLabels:
+          app: server
+    ports:
+    - port: 27017
+      protocol: TCP
+# ---
+
+# apiVersion: networking.k8s.io/v1
+# kind: NetworkPolicy
+# metadata:
+#   name: server-external-ingress
+# spec:
+#   podSelector:
+#     matchLabels:
+#       app: server
+#   ingress:
+#     - from: []
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: NetworkPolicy
+# metadata:
+#   name: allow-all-egress
+# spec:
+#   podSelector: 
+#       matchLabels:
+#         app: server
+#   egress:
+#   - {}
+#   policyTypes:
+#   - Egress
 
   
